@@ -1,21 +1,31 @@
 import React from 'react';
-import { useDispatch } from "react-redux";
-import { signInUser } from "../api/thunk";
+import { useNavigate } from 'react-router-dom';
+import Button from './generics/Button';
 
 function Welcome() {
-  const dispatch = useDispatch();
-
-  const handleSignIn = () => {
-    const email = "test@example.com"; // Replace with user input
-    const password = "password123"; // Replace with user input
-    dispatch(signInUser({ email, password }));
-  };
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <h1>Welcome to the Chat App</h1>
-      <p>Please sign in to continue.</p>
-      <button onClick={handleSignIn}>Sign In</button>
+    <div className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Chat App</h1>
+      <p className="text-gray-600 mb-8 text-center max-w-md">
+        Join our community and start chatting with friends and colleagues in real-time.
+      </p>
+      <div className="space-x-4">
+        <Button
+          label="Sign In"
+          onClick={() => navigate('/login')}
+        />
+        <Button
+          label="Learn More"
+          onClick={() => navigate('/about')}
+          style={{
+            backgroundColor: 'transparent',
+            color: '#3B82F6',
+            border: '1px solid #3B82F6'
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -1,21 +1,24 @@
 import React from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
-function Button({ label, onClick, style }) {
+function Button({ label, onClick, style, isLoading, disabled }) {
   return (
     <button
       onClick={onClick}
-      style={{
-        padding: '10px 20px',
-        margin: '5px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: '#007BFF',
-        color: '#fff',
-        cursor: 'pointer',
-        ...style,
-      }}
+      disabled={isLoading || disabled}
+      className={`
+        px-4 py-2 m-1 rounded bg-blue-500 text-white
+        transition-all duration-200 ease-in-out
+        ${(isLoading || disabled) ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-600 cursor-pointer'}
+      `}
+      style={style}
     >
-      {label}
+      {isLoading ? (
+        <div className="flex items-center justify-center">
+          <LoadingSpinner size="sm" color="white" className="mr-2" />
+          Loading...
+        </div>
+      ) : label}
     </button>
   );
 }
