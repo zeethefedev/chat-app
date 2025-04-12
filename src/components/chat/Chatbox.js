@@ -120,18 +120,10 @@ function Chatbox() {
   };
 
   return (
-    <div
-      className={`
-      flex flex-col h-[80vh] rounded-lg shadow-md p-4
-      ${preferences.theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-50"}
-    `}
-    >
+    <div className="flex flex-col h-[80vh] rounded-lg shadow-md p-4">
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <LoadingSpinner
-            size="lg"
-            color={preferences.theme === "dark" ? "white" : "blue"}
-          />
+          <LoadingSpinner size="lg" color="blue" />
         </div>
       ) : (
         <div
@@ -155,38 +147,33 @@ function Chatbox() {
       )}
       <SendMessage onSend={handleSendMessage} />
       {!isNearBottom && (
-        <button
-          onClick={() => scrollToBottom(true)}
-          className={`
-            absolute bottom-20 right-8 p-2 rounded-full shadow-lg
-            transition-colors
-            ${
-              preferences.theme === "dark"
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-blue-500 hover:bg-blue-600"
-            }
-            text-white
-          `}
-          aria-label="Scroll to bottom"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </button>
+        <ScrollToBottomButton onClick={() => scrollToBottom(true)} />
       )}
     </div>
   );
+}
+
+function ScrollToBottomButton({ onClick }) {
+  <button
+    onClick={onClick}
+    className="absolute bottom-20 right-8 p-2 rounded-full shadow-lg transition-colors text-white"
+    aria-label="Scroll to bottom"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+      />
+    </svg>
+  </button>;
 }
 
 export default Chatbox;

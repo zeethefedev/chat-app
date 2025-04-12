@@ -15,15 +15,6 @@ function Error() {
       </p>
       <div className="space-x-4">
         <Button label="Back to Home" onClick={() => navigate("/")} />
-        <Button
-          label="Contact Support"
-          onClick={() => (window.location.href = "mailto:support@chatapp.com")}
-          style={{
-            backgroundColor: "transparent",
-            color: "#3B82F6",
-            border: "1px solid #3B82F6",
-          }}
-        />
       </div>
     </div>
   );

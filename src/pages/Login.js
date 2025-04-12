@@ -6,20 +6,39 @@ import Input from "../components/generics/Input";
 import Button from "../components/generics/Button";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [user, setUser] = useState([
+    { name: "email", value: "" },
+    { name: "password", value: "" },
+  ]);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { loading, error } = useSelector((state) => state.reducer);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (email.trim() && password.trim()) {
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    const validForm = user.every((input) => input.value);
+
+    if (validForm) {
+      const email = user.find((input) => input.name === "email").value;
+      const password = user.find((input) => input.name === "password").value;
+
       const result = await dispatch(signInUser({ email, password }));
       if (!result.error) {
         navigate("/chat");
       }
     }
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    const newUser = user.map((input) =>
+      input.name === name ? { ...input, value: value.trim() } : input
+    );
+
+    setUser(newUser);
   };
 
   return (
@@ -36,22 +55,15 @@ function Login() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
-          <div>
+          {user.map((input) => (
             <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name={input.name}
+              type={input}
+              placeholder={input.name}
+              value={input.value}
+              onChange={handleChange}
             />
-          </div>
-          <div>
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          ))}
           <Button
             label={loading ? "Signing in..." : "Sign In"}
             onClick={handleLogin}
