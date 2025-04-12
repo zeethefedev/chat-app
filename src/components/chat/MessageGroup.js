@@ -1,5 +1,5 @@
-import React from 'react';
-import Message from './Message';
+import React from "react";
+import Message from "./Message";
 
 function MessageGroup({ messages, date }) {
   const formatDate = (dateStr) => {
@@ -9,9 +9,9 @@ function MessageGroup({ messages, date }) {
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (messageDate.toDateString() === today.toDateString()) {
-      return 'Today';
+      return "Today";
     } else if (messageDate.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
+      return "Yesterday";
     }
     return messageDate.toLocaleDateString();
   };
@@ -25,10 +25,7 @@ function MessageGroup({ messages, date }) {
       </div>
       <div className="space-y-2">
         {messages.map((message) => (
-          <Message
-            key={message.id}
-            {...message}
-          />
+          <Message key={message.id} {...message} />
         ))}
       </div>
     </div>

@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const PREFERENCES_KEY = 'chat_preferences';
+const PREFERENCES_KEY = "chat_preferences";
 
 const defaultPreferences = {
-  theme: 'light',
-  fontSize: 'medium',
+  theme: "light",
+  fontSize: "medium",
   notificationsEnabled: true,
   messageGrouping: true,
   soundEnabled: true,
-  timestampFormat: '12h'
+  timestampFormat: "12h",
 };
 
 export function usePreferences() {
@@ -22,9 +22,9 @@ export function usePreferences() {
   }, [preferences]);
 
   const updatePreference = (key, value) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -35,6 +35,6 @@ export function usePreferences() {
   return {
     preferences,
     updatePreference,
-    resetPreferences
+    resetPreferences,
   };
 }

@@ -10,14 +10,34 @@ const firebaseConfig = {
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 if (!firebaseConfig.apiKey) {
-  console.error('Firebase configuration is missing. Please check your environment variables.');
+  console.error(
+    "Firebase configuration is missing. Please check your environment variables."
+  );
 }
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// // Import the functions you need from the SDKs you need
+// import { initializeApp } from "firebase/app";
+// // TODO: Add SDKs for Firebase products that you want to use
+// // https://firebase.google.com/docs/web/setup#available-libraries
+
+// // Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyAPuQoZ1KYlg_XOFkWotZQ61Zaf9Eq0PJ0",
+//   authDomain: "chat-app-fc023.firebaseapp.com",
+//   projectId: "chat-app-fc023",
+//   storageBucket: "chat-app-fc023.firebasestorage.app",
+//   messagingSenderId: "955086267651",
+//   appId: "1:955086267651:web:536d519aedd3cd94357536"
+// };
+
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);

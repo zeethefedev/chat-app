@@ -1,14 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth, db } from "./firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  orderBy, 
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
   onSnapshot,
-  serverTimestamp 
+  serverTimestamp,
 } from "firebase/firestore";
 
 // Thunk for signing in a user
@@ -16,7 +16,11 @@ export const signInUser = createAsyncThunk(
   "auth/signInUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       return userCredential.user;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -44,7 +48,7 @@ export const addDocument = createAsyncThunk(
     try {
       const docRef = await addDoc(collection(db, collectionName), {
         ...data,
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
       });
       return { id: docRef.id, ...data };
     } catch (error) {
@@ -58,12 +62,17 @@ export const fetchDocuments = createAsyncThunk(
   "firestore/fetchDocuments",
   async (collectionName, { rejectWithValue }) => {
     try {
-      const q = query(collection(db, collectionName), orderBy("timestamp", "asc"));
+      const q = query(
+        collection(db, collectionName),
+        orderBy("timestamp", "asc")
+      );
       const querySnapshot = await getDocs(q);
-      const documents = querySnapshot.docs.map((doc) => ({ 
-        id: doc.id, 
+      const documents = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
         ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.().toISOString() || new Date().toISOString()
+        timestamp:
+          doc.data().timestamp?.toDate?.().toISOString() ||
+          new Date().toISOString(),
       }));
       return documents;
     } catch (error) {
@@ -75,14 +84,20 @@ export const fetchDocuments = createAsyncThunk(
 // Function to subscribe to real-time updates
 export const subscribeToCollection = (collectionName, callback) => {
   const q = query(collection(db, collectionName), orderBy("timestamp", "asc"));
-  return onSnapshot(q, (snapshot) => {
-    const documents = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate?.().toISOString() || new Date().toISOString()
-    }));
-    callback(documents);
-  }, (error) => {
-    console.error("Error in real-time subscription:", error);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const documents = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp:
+          doc.data().timestamp?.toDate?.().toISOString() ||
+          new Date().toISOString(),
+      }));
+      callback(documents);
+    },
+    (error) => {
+      console.error("Error in real-time subscription:", error);
+    }
+  );
 };

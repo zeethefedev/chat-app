@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { usePreferences } from './usePreferences';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { usePreferences } from "./usePreferences";
 
 export function useKeyboardShortcuts() {
   const navigate = useNavigate();
@@ -12,34 +12,40 @@ export function useKeyboardShortcuts() {
       if (!(event.metaKey || event.ctrlKey)) return;
 
       switch (event.key) {
-        case 'k':
+        case "k":
           // Toggle theme
           event.preventDefault();
-          updatePreference('theme', preferences.theme === 'dark' ? 'light' : 'dark');
+          updatePreference(
+            "theme",
+            preferences.theme === "dark" ? "light" : "dark"
+          );
           break;
 
-        case ',':
+        case ",":
           // Open settings
           event.preventDefault();
-          navigate('/settings');
+          navigate("/settings");
           break;
 
-        case 'h':
+        case "h":
           // Go home
           event.preventDefault();
-          navigate('/');
+          navigate("/");
           break;
 
-        case 'm':
+        case "m":
           // Toggle message grouping
           event.preventDefault();
-          updatePreference('messageGrouping', !preferences.messageGrouping);
+          updatePreference("messageGrouping", !preferences.messageGrouping);
           break;
 
-        case 'n':
+        case "n":
           // Toggle notifications
           event.preventDefault();
-          updatePreference('notificationsEnabled', !preferences.notificationsEnabled);
+          updatePreference(
+            "notificationsEnabled",
+            !preferences.notificationsEnabled
+          );
           break;
 
         default:
@@ -47,17 +53,23 @@ export function useKeyboardShortcuts() {
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [navigate, preferences.theme, preferences.messageGrouping, preferences.notificationsEnabled, updatePreference]);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [
+    navigate,
+    preferences.theme,
+    preferences.messageGrouping,
+    preferences.notificationsEnabled,
+    updatePreference,
+  ]);
 
   // Return a list of available shortcuts for documentation
   const shortcuts = [
-    { key: '⌘/Ctrl + K', description: 'Toggle dark/light theme' },
-    { key: '⌘/Ctrl + ,', description: 'Open settings' },
-    { key: '⌘/Ctrl + H', description: 'Go home' },
-    { key: '⌘/Ctrl + M', description: 'Toggle message grouping' },
-    { key: '⌘/Ctrl + N', description: 'Toggle notifications' }
+    { key: "⌘/Ctrl + K", description: "Toggle dark/light theme" },
+    { key: "⌘/Ctrl + ,", description: "Open settings" },
+    { key: "⌘/Ctrl + H", description: "Go home" },
+    { key: "⌘/Ctrl + M", description: "Toggle message grouping" },
+    { key: "⌘/Ctrl + N", description: "Toggle notifications" },
   ];
 
   return { shortcuts };

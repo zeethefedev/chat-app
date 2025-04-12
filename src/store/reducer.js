@@ -1,27 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { signInUser, signOutUser, fetchDocuments, addDocument } from "../api/thunk";
+import {
+  signInUser,
+  signOutUser,
+  fetchDocuments,
+  addDocument,
+} from "../api/thunk";
 
 const getErrorMessage = (error) => {
-  if (!error) return 'An unknown error occurred';
-  
+  if (!error) return "An unknown error occurred";
+
   // Firebase auth error codes
   switch (error.code) {
-    case 'auth/invalid-email':
-      return 'Invalid email address';
-    case 'auth/user-disabled':
-      return 'This account has been disabled';
-    case 'auth/user-not-found':
-      return 'No account found with this email';
-    case 'auth/wrong-password':
-      return 'Invalid password';
-    case 'auth/email-already-in-use':
-      return 'This email is already registered';
-    case 'auth/weak-password':
-      return 'Password should be at least 6 characters';
-    case 'auth/network-request-failed':
-      return 'Network error. Please check your connection';
+    case "auth/invalid-email":
+      return "Invalid email address";
+    case "auth/user-disabled":
+      return "This account has been disabled";
+    case "auth/user-not-found":
+      return "No account found with this email";
+    case "auth/wrong-password":
+      return "Invalid password";
+    case "auth/email-already-in-use":
+      return "This email is already registered";
+    case "auth/weak-password":
+      return "Password should be at least 6 characters";
+    case "auth/network-request-failed":
+      return "Network error. Please check your connection";
     default:
-      return error.message || 'An error occurred';
+      return error.message || "An error occurred";
   }
 };
 
@@ -32,7 +37,7 @@ export const slice = createSlice({
     messages: [],
     loading: false,
     error: null,
-    lastMessageTimestamp: null
+    lastMessageTimestamp: null,
   },
   reducers: {
     clearError: (state) => {
@@ -40,7 +45,7 @@ export const slice = createSlice({
     },
     updateLastMessageTimestamp: (state, action) => {
       state.lastMessageTimestamp = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -61,7 +66,8 @@ export const slice = createSlice({
       .addCase(fetchDocuments.fulfilled, (state, action) => {
         state.messages = action.payload;
         if (action.payload.length > 0) {
-          state.lastMessageTimestamp = action.payload[action.payload.length - 1].timestamp;
+          state.lastMessageTimestamp =
+            action.payload[action.payload.length - 1].timestamp;
         }
         state.loading = false;
         state.error = null;
@@ -74,14 +80,14 @@ export const slice = createSlice({
       })
       // Loading and error cases
       .addMatcher(
-        action => action.type.endsWith('/pending'),
+        (action) => action.type.endsWith("/pending"),
         (state) => {
           state.loading = true;
           state.error = null;
         }
       )
       .addMatcher(
-        action => action.type.endsWith('/rejected'),
+        (action) => action.type.endsWith("/rejected"),
         (state, action) => {
           state.loading = false;
           state.error = getErrorMessage(action.payload);

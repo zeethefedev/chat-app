@@ -1,9 +1,9 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import Chatbox from '../components/chat/Chatbox';
+import React from "react";
+import { useSelector } from "react-redux";
+import Chatbox from "../components/chat/Chatbox";
 
 function Chat() {
-  const { loading, error } = useSelector(state => state.reducer);
+  const { loading, error } = useSelector((state) => state.reducer);
 
   return (
     <div className="container mx-auto px-4 py-8">

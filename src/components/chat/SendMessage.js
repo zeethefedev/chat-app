@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Button from '../generics/Button';
-import { usePreferences } from '../../hooks/usePreferences';
-import { useTextFormatting } from '../../hooks/useTextFormatting';
+import React, { useState, useRef, useEffect } from "react";
+import Button from "../generics/Button";
+import { usePreferences } from "../../hooks/usePreferences";
+import { useTextFormatting } from "../../hooks/useTextFormatting";
 
 function SendMessage({ onSend }) {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const inputRef = useRef(null);
@@ -21,7 +21,7 @@ function SendMessage({ onSend }) {
       setIsSending(true);
       try {
         await onSend(message);
-        setMessage('');
+        setMessage("");
         inputRef.current?.focus();
       } finally {
         setIsSending(false);
@@ -33,12 +33,12 @@ function SendMessage({ onSend }) {
     // Skip if using IME (Input Method Editor for non-English input)
     if (isComposing) return;
 
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       if (e.shiftKey) {
         // Allow new line with Shift+Enter
         return;
       }
-      
+
       if (!e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         handleSubmit(e);
@@ -50,11 +50,11 @@ function SendMessage({ onSend }) {
       const { selectionStart, selectionEnd } = inputRef.current;
       let newText = message;
 
-      switch(e.key) {
-        case 'b':
-        case 'i':
-        case 's':
-        case '`':
+      switch (e.key) {
+        case "b":
+        case "i":
+        case "s":
+        case "`":
           e.preventDefault();
           newText = handleFormatting(
             message,
@@ -73,10 +73,10 @@ function SendMessage({ onSend }) {
   // Format the message for display
   const formatMessagePreview = (text) => {
     return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/_(.*?)_/g, '<em>$1</em>')
-      .replace(/~~(.*?)~~/g, '<del>$1</del>')
-      .replace(/`(.*?)`/g, '<code>$1</code>');
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/_(.*?)_/g, "<em>$1</em>")
+      .replace(/~~(.*?)~~/g, "<del>$1</del>")
+      .replace(/`(.*?)`/g, "<code>$1</code>");
   };
 
   return (
@@ -92,30 +92,37 @@ function SendMessage({ onSend }) {
           placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
           className={`
             w-full p-2 rounded border min-h-[40px] max-h-32 resize-y
-            ${preferences.theme === 'dark' 
-              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-              : 'bg-white border-gray-300 text-gray-700 placeholder-gray-400'
+            ${
+              preferences.theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
             }
             focus:outline-none focus:ring-2 focus:ring-blue-500
             transition-colors duration-200
           `}
           disabled={isSending}
           style={{
-            fontSize: preferences.fontSize === 'large' ? '1.125rem' : 
-                     preferences.fontSize === 'small' ? '0.875rem' : '1rem'
+            fontSize:
+              preferences.fontSize === "large"
+                ? "1.125rem"
+                : preferences.fontSize === "small"
+                ? "0.875rem"
+                : "1rem",
           }}
         />
         {message.length > 0 && (
-          <div className={`
+          <div
+            className={`
             absolute right-2 bottom-2 text-xs
-            ${preferences.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
-          `}>
-            {message.length} character{message.length !== 1 ? 's' : ''}
+            ${preferences.theme === "dark" ? "text-gray-400" : "text-gray-500"}
+          `}
+          >
+            {message.length} character{message.length !== 1 ? "s" : ""}
           </div>
         )}
       </div>
-      
-      {message.includes('*') || message.includes('_') || message.includes('~') || message.includes('`') ? (
+
+      {/* {message.includes('*') || message.includes('_') || message.includes('~') || message.includes('`') ? (
         <div className={`
           text-sm p-2 rounded
           ${preferences.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}
@@ -128,7 +135,7 @@ function SendMessage({ onSend }) {
             `}
           />
         </div>
-      )}
+      )} */}
 
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
@@ -136,11 +143,17 @@ function SendMessage({ onSend }) {
             type="button"
             onClick={() => {
               const { selectionStart, selectionEnd } = inputRef.current;
-              setMessage(handleFormatting(message, 'b', selectionStart, selectionEnd));
+              setMessage(
+                handleFormatting(message, "b", selectionStart, selectionEnd)
+              );
             }}
             className={`
               p-1 rounded hover:bg-opacity-80
-              ${preferences.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              ${
+                preferences.theme === "dark"
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
             `}
             title="Bold (⌘/Ctrl + B)"
           >
@@ -150,11 +163,17 @@ function SendMessage({ onSend }) {
             type="button"
             onClick={() => {
               const { selectionStart, selectionEnd } = inputRef.current;
-              setMessage(handleFormatting(message, 'i', selectionStart, selectionEnd));
+              setMessage(
+                handleFormatting(message, "i", selectionStart, selectionEnd)
+              );
             }}
             className={`
               p-1 rounded hover:bg-opacity-80
-              ${preferences.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              ${
+                preferences.theme === "dark"
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
             `}
             title="Italic (⌘/Ctrl + I)"
           >
@@ -164,11 +183,17 @@ function SendMessage({ onSend }) {
             type="button"
             onClick={() => {
               const { selectionStart, selectionEnd } = inputRef.current;
-              setMessage(handleFormatting(message, 's', selectionStart, selectionEnd));
+              setMessage(
+                handleFormatting(message, "s", selectionStart, selectionEnd)
+              );
             }}
             className={`
               p-1 rounded hover:bg-opacity-80
-              ${preferences.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              ${
+                preferences.theme === "dark"
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
             `}
             title="Strikethrough (⌘/Ctrl + S)"
           >
@@ -178,19 +203,25 @@ function SendMessage({ onSend }) {
             type="button"
             onClick={() => {
               const { selectionStart, selectionEnd } = inputRef.current;
-              setMessage(handleFormatting(message, '`', selectionStart, selectionEnd));
+              setMessage(
+                handleFormatting(message, "`", selectionStart, selectionEnd)
+              );
             }}
             className={`
               p-1 rounded hover:bg-opacity-80 font-mono
-              ${preferences.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}
+              ${
+                preferences.theme === "dark"
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
             `}
             title="Code (⌘/Ctrl + `)"
           >
             {`<>`}
           </button>
         </div>
-        <Button 
-          label={isSending ? 'Sending...' : 'Send'}
+        <Button
+          label={isSending ? "Sending..." : "Send"}
           onClick={handleSubmit}
           isLoading={isSending}
           disabled={!message.trim()}
