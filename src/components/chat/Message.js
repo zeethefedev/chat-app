@@ -41,7 +41,7 @@ function Message({ text, user, timestamp }) {
       // Code blocks
       .replace(
         /`([^`]+)`/g,
-        '<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded font-mono text-sm">$1</code>'
+        '<code class="bg-gray-100 px-1 py-0.5 rounded font-mono text-sm">$1</code>'
       )
       // Bold
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
@@ -63,30 +63,14 @@ function Message({ text, user, timestamp }) {
   return (
     <div className="mb-4 fade-in">
       <div className="flex items-start gap-2">
-        <div
-          className={`
-          p-3 rounded-lg shadow-sm max-w-[80%] message-new
-          ${
-            preferences.theme === "dark" ? "bg-gray-800 text-white" : "bg-white"
-          }
-        `}
-        >
+        <div className="p-3 rounded-lg shadow-sm max-w-[80%] message-new">
           <div className={`font-semibold ${getFontSize()}`}>{user}</div>
           <p
             className={`${getFontSize()} break-words`}
             dangerouslySetInnerHTML={formatMessageText}
           />
           {timestamp && (
-            <div
-              className={`
-              text-xs mt-1
-              ${
-                preferences.theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }
-            `}
-            >
-              {formatTimestamp(timestamp)}
-            </div>
+            <div className="text-xs mt-1">{formatTimestamp(timestamp)}</div>
           )}
         </div>
       </div>

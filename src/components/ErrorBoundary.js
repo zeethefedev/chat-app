@@ -1,6 +1,5 @@
 import React from "react";
 import Button from "./generics/Button";
-import { usePreferences } from "../hooks/usePreferences";
 
 class ErrorBoundaryClass extends React.Component {
   constructor(props) {
@@ -59,57 +58,20 @@ class ErrorBoundaryClass extends React.Component {
   }
 }
 
-// Separate UI component to use hooks
 function ErrorUI({ error, onReset, onReport }) {
-  const { preferences } = usePreferences();
-  const isDark = preferences.theme === "dark";
-
   return (
-    <div
-      className={`
-      min-h-screen flex flex-col items-center justify-center p-4
-      ${
-        isDark
-          ? "bg-gray-900 text-white"
-          : "bg-gradient-to-b from-red-50 to-white"
-      }
-    `}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-red-50 to-white">
       <div className="max-w-md text-center">
-        <div
-          className={`
-          p-4 rounded-lg mb-6
-          ${isDark ? "bg-gray-800" : "bg-white shadow-lg"}
-        `}
-        >
-          <h1
-            className={`
-            text-2xl font-bold mb-4
-            ${isDark ? "text-red-400" : "text-red-600"}
-          `}
-          >
+        <div className="p-4 rounded-lg mb-6 bg-white shadow-lg">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">
             Oops! Something went wrong
           </h1>
-          <p
-            className={`
-            mb-4
-            ${isDark ? "text-gray-300" : "text-gray-600"}
-          `}
-          >
+          <p className="mb-4 text-gray-600">
             We're sorry for the inconvenience. The error has been logged and
             we'll look into it.
           </p>
           {error && (
-            <div
-              className={`
-              text-left p-3 rounded mb-4 font-mono text-sm
-              ${
-                isDark
-                  ? "bg-gray-900 text-gray-300"
-                  : "bg-gray-100 text-gray-700"
-              }
-            `}
-            >
+            <div className="text-left p-3 rounded mb-4 font-mono text-sm bg-gray-100 text-gray-700">
               {error.toString()}
             </div>
           )}
@@ -122,8 +84,8 @@ function ErrorUI({ error, onReset, onReport }) {
             onClick={onReport}
             style={{
               backgroundColor: "transparent",
-              color: isDark ? "#60A5FA" : "#3B82F6",
-              border: `1px solid ${isDark ? "#60A5FA" : "#3B82F6"}`,
+              color: "#3B82F6",
+              border: "1px solid #3B82F6",
             }}
           />
         </div>
@@ -132,7 +94,6 @@ function ErrorUI({ error, onReset, onReport }) {
   );
 }
 
-// Wrap the class component to provide preferences context
 function ErrorBoundary(props) {
   return <ErrorBoundaryClass {...props} />;
 }

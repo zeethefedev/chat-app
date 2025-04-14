@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 const PREFERENCES_KEY = "chat_preferences";
 
 const defaultPreferences = {
-  theme: "light",
   fontSize: "medium",
   notificationsEnabled: true,
   messageGrouping: true,

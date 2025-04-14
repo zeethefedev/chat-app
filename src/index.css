@@ -8,12 +8,6 @@
   --scrollbar-thumb-hover: #555;
 }
 
-.dark {
-  --scrollbar-track: #2d3748;
-  --scrollbar-thumb: #4a5568;
-  --scrollbar-thumb-hover: #718096;
-}
-
 /* Custom base styles */
 body {
   margin: 0;
@@ -45,11 +39,6 @@ code {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
-}
-
-/* Dark mode transitions */
-.dark-mode-transition {
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Message animations */
