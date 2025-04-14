@@ -1,58 +1,19 @@
 import React, { useMemo } from "react";
 import { usePreferences } from "../../hooks/usePreferences";
 import { useAutoFormat } from "../../hooks/useAutoFormat";
+import { formatText, formatTimestamp } from "../../utils/chat.utils";
+import { getFontSize } from "../../utils/perference.utils";
 
 function Message({ text, user, timestamp }) {
   const { preferences } = usePreferences();
   const { applyAutoFormat } = useAutoFormat();
 
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    if (preferences.timestampFormat === "24h") {
-      return date.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const getFontSize = () => {
-    switch (preferences.fontSize) {
-      case "small":
-        return "text-sm";
-      case "large":
-        return "text-lg";
-      default:
-        return "text-base";
-    }
-  };
+  const formattedTimestamp = formatTimestamp(timestamp, preferences);
+  const fontSize = getFontSize(preferences);
 
   const formatMessageText = useMemo(() => {
-    let formattedText = text;
-
     // First apply manual formatting
-    formattedText = formattedText
-      // Code blocks
-      .replace(
-        /`([^`]+)`/g,
-        '<code class="bg-gray-100 px-1 py-0.5 rounded font-mono text-sm">$1</code>'
-      )
-      // Bold
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      // Italic
-      .replace(/_([^_]+)_/g, "<em>$1</em>")
-      // Strikethrough
-      .replace(/~~([^~]+)~~/g, "<del>$1</del>")
-      // Simple emoji replacement
-      .replace(/:smile:/g, "😊")
-      .replace(/:heart:/g, "❤️")
-      .replace(/:thumbsup:/g, "👍");
+    let formattedText = formatText(text);
 
     // Then apply auto-formatting
     formattedText = applyAutoFormat(formattedText);
@@ -64,13 +25,13 @@ function Message({ text, user, timestamp }) {
     <div className="mb-4 fade-in">
       <div className="flex items-start gap-2">
         <div className="p-3 rounded-lg shadow-sm max-w-[80%] message-new">
-          <div className={`font-semibold ${getFontSize()}`}>{user}</div>
+          <div className={`font-semibold ${fontSize}`}>{user}</div>
           <p
-            className={`${getFontSize()} break-words`}
+            className={`${fontSize} break-words`}
             dangerouslySetInnerHTML={formatMessageText}
           />
           {timestamp && (
-            <div className="text-xs mt-1">{formatTimestamp(timestamp)}</div>
+            <div className="text-xs mt-1">{formattedTimestamp}</div>
           )}
         </div>
       </div>

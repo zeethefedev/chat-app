@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MessageGroup from "./MessageGroup";
-import SendMessage from "./SendMessage";
+import MessageInput from "./MessageInput";
 import LoadingSpinner from "../generics/LoadingSpinner";
 import { useNotifications } from "../../hooks/useNotifications";
 import { usePreferences } from "../../hooks/usePreferences";
@@ -145,7 +145,9 @@ function Chatbox() {
           )}
         </div>
       )}
-      <SendMessage onSend={handleSendMessage} />
+      <div className="flex-none">
+        <MessageInput onSend={handleSendMessage} />
+      </div>
       {!isNearBottom && (
         <ScrollToBottomButton onClick={() => scrollToBottom(true)} />
       )}
