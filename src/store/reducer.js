@@ -2,33 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   signInUser,
   signOutUser,
-  fetchDocuments,
-  addDocument,
+  fetchMessages,
+  addMessage,
 } from "../api/thunk";
-
-const getErrorMessage = (error) => {
-  if (!error) return "An unknown error occurred";
-
-  // Firebase auth error codes
-  switch (error.code) {
-    case "auth/invalid-email":
-      return "Invalid email address";
-    case "auth/user-disabled":
-      return "This account has been disabled";
-    case "auth/user-not-found":
-      return "No account found with this email";
-    case "auth/wrong-password":
-      return "Invalid password";
-    case "auth/email-already-in-use":
-      return "This email is already registered";
-    case "auth/weak-password":
-      return "Password should be at least 6 characters";
-    case "auth/network-request-failed":
-      return "Network error. Please check your connection";
-    default:
-      return error.message || "An error occurred";
-  }
-};
+import { getErrorMessage } from "../utils/auth.utils";
 
 export const slice = createSlice({
   name: "chat",
@@ -45,6 +22,16 @@ export const slice = createSlice({
     },
     updateLastMessageTimestamp: (state, action) => {
       state.lastMessageTimestamp = action.payload;
+    },
+    updateMessages: (state, action) => {
+      const messages = action.payload;
+      state.messages = messages;
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        state.lastMessageTimestamp = lastMessage.timestamp;
+      }
+      state.loading = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -63,18 +50,22 @@ export const slice = createSlice({
         state.lastMessageTimestamp = null;
       })
       // Messages cases
-      .addCase(fetchDocuments.fulfilled, (state, action) => {
-        state.messages = action.payload;
-        if (action.payload.length > 0) {
-          state.lastMessageTimestamp =
-            action.payload[action.payload.length - 1].timestamp;
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        const messages = action.payload;
+        state.messages = messages;
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          state.lastMessageTimestamp = lastMessage.timestamp;
         }
         state.loading = false;
         state.error = null;
       })
-      .addCase(addDocument.fulfilled, (state, action) => {
-        state.messages.push(action.payload);
-        state.lastMessageTimestamp = action.payload.timestamp;
+      .addCase(addMessage.fulfilled, (state, action) => {
+        const newMessage = action.payload;
+        const newMessages = [...state.messages, newMessage];
+
+        state.messages = newMessages;
+        state.lastMessageTimestamp = newMessage.timestamp;
         state.loading = false;
         state.error = null;
       })
@@ -89,13 +80,15 @@ export const slice = createSlice({
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
         (state, action) => {
+          const error = action.payload;
           state.loading = false;
-          state.error = getErrorMessage(action.payload);
+          state.error = getErrorMessage(error);
         }
       );
   },
 });
 
-export const { clearError, updateLastMessageTimestamp } = slice.actions;
+export const { clearError, updateLastMessageTimestamp, updateMessages } =
+  slice.actions;
 
 export default slice.reducer;

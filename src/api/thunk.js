@@ -41,15 +41,16 @@ export const signOutUser = createAsyncThunk(
   }
 );
 
-// Thunk for adding a document to Firestore with server timestamp
-export const addDocument = createAsyncThunk(
-  "firestore/addDocument",
-  async ({ collectionName, data }, { rejectWithValue }) => {
+const messagesDb = collection(db, "messages");
+const q = query(messagesDb, orderBy("timestamp", "asc"));
+
+// Thunk for adding a message to Firestore with server timestamp
+export const addMessage = createAsyncThunk(
+  "firestore/addMessage",
+  async (data, { rejectWithValue }) => {
     try {
-      const docRef = await addDoc(collection(db, collectionName), {
-        ...data,
-        timestamp: serverTimestamp(),
-      });
+      const newMessage = { ...data, timestamp: serverTimestamp() };
+      const docRef = await addDoc(messagesDb, newMessage);
       return { id: docRef.id, ...data };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -57,47 +58,44 @@ export const addDocument = createAsyncThunk(
   }
 );
 
-// Thunk for fetching documents from Firestore
-export const fetchDocuments = createAsyncThunk(
-  "firestore/fetchDocuments",
-  async (collectionName, { rejectWithValue }) => {
+const getMessage = (doc) => {
+  const data = doc.data();
+  const timestamp =
+    data.timestamp?.toDate?.().toISOString() || new Date().toISOString();
+
+  return {
+    id: doc.id,
+    ...data,
+    timestamp,
+  };
+};
+
+// Thunk for fetching messages from Firestore
+export const fetchMessages = createAsyncThunk(
+  "firestore/fetchMessages",
+  async (_, { rejectWithValue }) => {
     try {
-      const q = query(
-        collection(db, collectionName),
-        orderBy("timestamp", "asc")
-      );
       const querySnapshot = await getDocs(q);
-      const documents = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp:
-          doc.data().timestamp?.toDate?.().toISOString() ||
-          new Date().toISOString(),
-      }));
-      return documents;
+      const messages = querySnapshot.docs.map((doc) => getMessage(doc));
+      return messages;
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
 
-// Function to subscribe to real-time updates
-export const subscribeToCollection = (collectionName, callback) => {
-  const q = query(collection(db, collectionName), orderBy("timestamp", "asc"));
+// Function to subscribe to real-time message updates
+export const subscribeToMessages = (callback) => {
   return onSnapshot(
     q,
-    (snapshot) => {
-      const documents = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp:
-          doc.data().timestamp?.toDate?.().toISOString() ||
-          new Date().toISOString(),
-      }));
-      callback(documents);
-    },
+    (snapshot) => handleSnapShotChange(snapshot, callback),
     (error) => {
       console.error("Error in real-time subscription:", error);
     }
   );
+};
+
+const handleSnapShotChange = (snapshot, callback) => {
+  const messages = snapshot.docs.map((doc) => getMessage(doc));
+  callback(messages);
 };
