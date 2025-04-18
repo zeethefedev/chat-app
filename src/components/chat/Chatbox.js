@@ -98,14 +98,14 @@ function Chatbox() {
     [preferences.messageGrouping]
   );
 
-  const handleSendMessage = async (text) => {
+  const handleSendMessage = (text) => {
     const newMessage = {
       text,
       user: user?.email || "Anonymous",
       timestamp: new Date().toISOString(),
     };
 
-    await dispatch(addMessage(newMessage));
+    dispatch(addMessage(newMessage));
   };
 
   return (

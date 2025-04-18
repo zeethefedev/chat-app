@@ -4,33 +4,33 @@ import { useNavigate, Link } from "react-router-dom";
 import { signInUser, signOutUser } from "../api/thunk";
 import Button from "./generics/Button";
 
+const NAV_LINKS = [
+  { to: "/chat", label: "Chat" },
+  { to: "/settings", label: "Settings" },
+];
+
+const MOCK_USER = {
+  email: "test@example.com",
+  password: "password123",
+};
+
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.reducer);
 
-  const navLinks = [
-    { to: "/chat", label: "Chat" },
-    { to: "/settings", label: "Settings" },
-  ];
-
-  const handleSignIn = async () => {
-    const result = await dispatch(
-      signInUser({
-        email: "test@example.com",
-        password: "password123",
-      })
-    );
-    if (!result.error) {
-      navigate("/chat");
-    }
+  const handleSignIn = () => {
+    dispatch(signInUser(MOCK_USER))
+      .unwrap()
+      .then(() => navigate("/chat"))
+      .catch(() => {});
   };
 
   const handleSignOut = async () => {
-    const result = await dispatch(signOutUser());
-    if (!result.error) {
-      navigate("/login");
-    }
+    dispatch(signOutUser())
+      .unwrap()
+      .then(() => navigate("/login"))
+      .catch(() => {});
   };
 
   return (
@@ -48,7 +48,7 @@ function Navbar() {
               <Button label="Sign In" onClick={handleSignIn} />
             ) : (
               <>
-                {navLinks.map((link) => (
+                {NAV_LINKS.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}

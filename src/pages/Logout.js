@@ -13,11 +13,11 @@ function Logout() {
     handleLogout();
   }, []);
 
-  const handleLogout = async () => {
-    const result = await dispatch(signOutUser());
-    if (!result.error) {
-      navigate("/login");
-    }
+  const handleLogout = () => {
+    dispatch(signOutUser())
+      .unwrap()
+      .then(() => navigate("/login"))
+      .catch(() => {});
   };
 
   return (
