@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../generics/Input";
 import Button from "../generics/Button";
+import ErrorMessage from "../generics/ErrorMessage";
 import { signInUser } from "../../api/thunk";
 import { useNavigate } from "react-router-dom";
 
@@ -47,12 +48,7 @@ function LoginForm() {
 
   return (
     <>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
+      <ErrorMessage message={error} className="mb-4" />
       <form onSubmit={handleLogin} className="space-y-4">
         {user.map((input) => (
           <Input

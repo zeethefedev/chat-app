@@ -1,18 +1,7 @@
 import React from "react";
 
 function Input(props) {
-  const {
-    type = "text",
-    placeholder,
-    value,
-    onChange,
-    error,
-    label,
-    id,
-    required,
-    onKeyDown,
-    className = "",
-  } = props;
+  const { error, label, id, required, className = "" } = props;
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
