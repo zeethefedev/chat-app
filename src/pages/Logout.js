@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signOutUser } from "../api/thunk";
 import Button from "../components/generics/Button";
+import ErrorMessage from "../components/generics/ErrorMessage";
+import LoadingSpinner from "../components/generics/LoadingSpinner";
 
 function Logout() {
   const dispatch = useDispatch();
@@ -20,6 +22,10 @@ function Logout() {
       .catch(() => {});
   };
 
+  const handleBackToHome = () => {
+    navigate("/");
+  };
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
@@ -27,19 +33,15 @@ function Logout() {
           Signing Out...
         </h2>
         {loading && (
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          </div>
+          <LoadingSpinner size="lg" className="flex justify-center" />
         )}
         {error && (
           <div className="mt-4">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
+            <ErrorMessage message={error} className="mb-4" />
             <Button label="Try Again" onClick={handleLogout} />
             <Button
               label="Back to Home"
-              onClick={() => navigate("/")}
+              onClick={handleBackToHome}
               style={{
                 backgroundColor: "transparent",
                 color: "#3B82F6",
