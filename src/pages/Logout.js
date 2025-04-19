@@ -5,6 +5,7 @@ import { signOutUser } from "../api/thunk";
 import Button from "../components/generics/Button";
 import ErrorMessage from "../components/generics/ErrorMessage";
 import LoadingSpinner from "../components/generics/LoadingSpinner";
+import LoadingOverlay from "../components/generics/LoadingOverlay";
 
 function Logout() {
   const dispatch = useDispatch();
@@ -32,9 +33,7 @@ function Logout() {
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Signing Out...
         </h2>
-        {loading && (
-          <LoadingSpinner size="lg" className="flex justify-center" />
-        )}
+        {loading && <LoadingOverlay className="flex justify-center" />}
         {error && (
           <div className="mt-4">
             <ErrorMessage message={error} className="mb-4" />
