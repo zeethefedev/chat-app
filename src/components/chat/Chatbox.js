@@ -22,25 +22,7 @@ function Chatbox() {
 
   useEffect(() => {
     // Set up real-time subscription
-    unsubscribeRef.current = subscribeToMessages((newMessages) => {
-      dispatch(updateMessages(newMessages));
-
-      // Check for new messages to show notifications
-      if (lastMessageRef.current && newMessages.length > 0) {
-        const lastMessage = newMessages[newMessages.length - 1];
-        if (
-          lastMessage.id !== lastMessageRef.current &&
-          lastMessage.user !== user?.email
-        ) {
-          showNotification("New Message", {
-            body: `${lastMessage.user}: ${lastMessage.text}`,
-            tag: "chat-message",
-          });
-        }
-      }
-      lastMessageRef.current =
-        newMessages.length > 0 ? newMessages[newMessages.length - 1].id : null;
-    });
+    unsubscribeRef.current = subscribeToMessages(handleMessageUpdate);
 
     // Cleanup subscription on unmount
     return () => {
@@ -50,53 +32,78 @@ function Chatbox() {
     };
   }, [user, showNotification, dispatch]);
 
-  const scrollToBottom = useCallback(
-    (force = false) => {
-      if (force || isNearBottom) {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }
-    },
-    [isNearBottom]
-  );
+  const handleMessageUpdate = (newMessages) => {
+    dispatch(updateMessages(newMessages));
 
-  const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      const { scrollHeight, scrollTop, clientHeight } = containerRef.current;
-      const scrollPosition = scrollHeight - scrollTop - clientHeight;
-      setIsNearBottom(scrollPosition < 100);
+    // Check for new messages to show notifications
+    const lastMessageContainer = lastMessageRef.current;
+    if (lastMessageContainer && newMessages.length > 0) {
+      const lastMessage = newMessages[newMessages.length - 1];
+      const { id, user: lastUser, text } = lastMessage;
+      const hasNewMessage =
+        id !== lastMessageContainer && lastUser !== user?.email;
+
+      if (hasNewMessage) {
+        showNotification("New Message", {
+          body: `${lastUser}: ${text}`,
+          tag: "chat-message",
+        });
+      }
     }
-  }, []);
+
+    lastMessageRef.current =
+      newMessages.length > 0 ? newMessages[newMessages.length - 1].id : null;
+  };
+
+  const scrollToBottom = (force = false) => {
+    if (force || isNearBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleScrollToBottom = useCallback(scrollToBottom, [isNearBottom]);
+
+  const scroll = () => {
+    if (!containerRef.current) return;
+
+    const { scrollHeight, scrollTop, clientHeight } = containerRef.current;
+    const scrollPosition = scrollHeight - scrollTop - clientHeight;
+    setIsNearBottom(scrollPosition < 100);
+  };
+
+  const handleScroll = useCallback(scroll, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    handleScrollToBottom();
+  }, [messages, handleScrollToBottom]);
 
-  const groupMessagesByDate = useCallback(
-    (messages) => {
-      if (!preferences.messageGrouping) {
-        return [
-          {
-            date: "Messages",
-            messages: messages,
-          },
-        ];
+  const handleGroupMessage = (messages) => {
+    if (!preferences.messageGrouping) {
+      return [{ date: "Messages", messages }];
+    }
+
+    const groups = {};
+    messages.forEach((message) => {
+      const date = new Date(message.timestamp).toDateString();
+      if (!groups[date]) {
+        groups[date] = [];
       }
 
-      const groups = {};
-      messages.forEach((message) => {
-        const date = new Date(message.timestamp).toDateString();
-        if (!groups[date]) {
-          groups[date] = [];
-        }
-        groups[date].push(message);
-      });
-      return Object.entries(groups).map(([date, messages]) => ({
-        date,
-        messages,
-      }));
-    },
-    [preferences.messageGrouping]
-  );
+      const newGroupByDate = [...groups[date], message];
+      groups[date] = newGroupByDate;
+    });
+
+    const formattedGroups = Object.entries(groups).map(([date, messages]) => ({
+      date,
+      messages,
+    }));
+
+    return formattedGroups;
+  };
+
+  const groupMessagesByDate = useCallback(handleGroupMessage, [
+    preferences.messageGrouping,
+  ]);
 
   const handleSendMessage = (text) => {
     const newMessage = {
@@ -138,7 +145,7 @@ function Chatbox() {
         <MessageInput onSend={handleSendMessage} />
       </div>
       {!isNearBottom && (
-        <ScrollToBottomButton onClick={() => scrollToBottom(true)} />
+        <ScrollToBottomButton onClick={() => handleScrollToBottom(true)} />
       )}
     </div>
   );

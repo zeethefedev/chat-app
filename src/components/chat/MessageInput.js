@@ -3,6 +3,9 @@ import Button from "../generics/Button";
 import { usePreferences } from "../../hooks/usePreferences";
 import { useTextFormatting } from "../../hooks/useTextFormatting";
 import { formatMessagePreview } from "../../utils/chat.utils";
+import TextArea from "../generics/TextArea";
+
+const FORMATTING_CHARS = ["*", "_", "~", "`"];
 
 function MessageInput({ onSend }) {
   const [message, setMessage] = useState("");
@@ -12,62 +15,67 @@ function MessageInput({ onSend }) {
   const { preferences } = usePreferences();
   const { handleFormatting } = useTextFormatting();
 
+  const isFormattedMessage = FORMATTING_CHARS.some((char) =>
+    message.includes(char)
+  );
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (message.trim() && !isSending) {
-      setIsSending(true);
-      try {
-        await onSend(message);
-        setMessage("");
-        inputRef.current?.focus();
-      } finally {
-        setIsSending(false);
-      }
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!message.trim() || isSending) return;
+
+    setIsSending(true);
+    try {
+      onSend(message);
+      setMessage("");
+      inputRef.current?.focus();
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (event) => {
     // Skip if using IME (Input Method Editor for non-English input)
     if (isComposing) return;
 
-    if (e.key === "Enter") {
-      if (e.shiftKey) {
-        // Allow new line with Shift+Enter
-        return;
-      }
+    const { key, shiftKey, metaKey, ctrlKey } = event;
 
-      if (!e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        handleSubmit(e);
-      }
-    }
+    if (key !== "Enter") return;
+    if (shiftKey) return;
+    if (ctrlKey || metaKey) return;
+
+    event.preventDefault();
+    handleSubmit(event);
 
     // Text formatting shortcuts
-    if ((e.metaKey || e.ctrlKey) && !e.shiftKey) {
-      const { selectionStart, selectionEnd } = inputRef.current;
-      let newText = message;
+    handleFormatMessage(event);
+  };
 
-      const formattingKeys = ["b", "i", "s", "`"];
-      if (formattingKeys.includes(e.key)) {
-        e.preventDefault();
-        newText = handleFormatting(
-          message,
-          e.key,
-          selectionStart,
-          selectionEnd
-        );
-        setMessage(newText);
-      }
+  const handleFormatMessage = (event) => {
+    const { key, shiftKey, metaKey, ctrlKey } = event;
+    // Text formatting shortcuts
+    const isFormattingShortcut = (metaKey || ctrlKey) && !shiftKey;
+    const formattingKeys = ["b", "i", "s", "`"];
+
+    if (!isFormattingShortcut) return;
+
+    const { selectionStart, selectionEnd } = inputRef.current;
+    let newText = message;
+
+    if (formattingKeys.includes(key)) {
+      event.preventDefault();
+      newText = handleFormatting(message, key, selectionStart, selectionEnd);
+      setMessage(newText);
     }
   };
 
   const handleTextFormatClick = (event, formatKey) => {
     event.preventDefault();
-    const { selectionStart, selectionEnd } = inputRef.current;
+    const { selectionStart, selectionEnd } = inputRef.current || {};
 
     const textMessage = handleFormatting(
       message,
@@ -79,48 +87,31 @@ function MessageInput({ onSend }) {
     setMessage(textMessage);
   };
 
+  const handleTextChange = (event) => {
+    const newText = event.target.value;
+    setMessage(newText);
+  };
+
+  const fontSize =
+    preferences.fontSize === "large"
+      ? "1.125rem"
+      : preferences.fontSize === "small"
+      ? "0.875rem"
+      : "1rem";
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-2">
-      <div className="flex-1 relative">
-        <textarea
-          ref={inputRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
-          placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
-          className="w-full p-2 rounded border min-h-[40px] max-h-32 resize-y bg-white border-gray-300 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
-          disabled={isSending}
-          style={{
-            fontSize:
-              preferences.fontSize === "large"
-                ? "1.125rem"
-                : preferences.fontSize === "small"
-                ? "0.875rem"
-                : "1rem",
-          }}
-        />
-        {message.length > 0 && (
-          <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-            {message.length} character{message.length !== 1 ? "s" : ""}
-          </div>
-        )}
-      </div>
-
-      {(message.includes("*") ||
-        message.includes("_") ||
-        message.includes("~") ||
-        message.includes("`")) && (
-        <div className="text-sm p-2 rounded bg-gray-50">
-          <div className="text-xs text-gray-500 mb-1">Preview:</div>
-          <div
-            dangerouslySetInnerHTML={{ __html: formatMessagePreview(message) }}
-            className="text-gray-700"
-          />
-        </div>
-      )}
-
+      <TextArea
+        inputRef={inputRef}
+        value={message}
+        onChange={handleTextChange}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={() => setIsComposing(true)}
+        onCompositionEnd={() => setIsComposing(false)}
+        disabled={isSending}
+        style={{ fontSize }}
+      />
+      {isFormattedMessage && <MessagePreview message={message} />}
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
           <TextFormatButton
@@ -156,6 +147,18 @@ function MessageInput({ onSend }) {
         />
       </div>
     </form>
+  );
+}
+
+function MessagePreview({ message }) {
+  return (
+    <div className="text-sm p-2 rounded bg-gray-50">
+      <div className="text-xs text-gray-500 mb-1">Preview:</div>
+      <div
+        dangerouslySetInnerHTML={{ __html: formatMessagePreview(message) }}
+        className="text-gray-700"
+      />
+    </div>
   );
 }
 
