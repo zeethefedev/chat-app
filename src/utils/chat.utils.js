@@ -1,5 +1,7 @@
 // Format the message for display
 export const formatMessagePreview = (text) => {
+  if (!text) return;
+
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/_(.*?)_/g, "<em>$1</em>")
