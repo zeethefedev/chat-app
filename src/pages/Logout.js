@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { signOutUser } from "../api/thunk";
 import Button from "../components/generics/Button";
 import ErrorMessage from "../components/generics/ErrorMessage";
-import LoadingSpinner from "../components/generics/LoadingSpinner";
 import LoadingOverlay from "../components/generics/LoadingOverlay";
 
 function Logout() {

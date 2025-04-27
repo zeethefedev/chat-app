@@ -14,7 +14,6 @@ function Chatbox() {
   const dispatch = useDispatch();
   const { user, messages, loading } = useSelector((state) => state.reducer);
   const { showNotification } = useNotifications();
-  const { preferences } = usePreferences();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const unsubscribeRef = useRef(null);
@@ -77,6 +76,53 @@ function Chatbox() {
     handleScrollToBottom();
   }, [messages, handleScrollToBottom]);
 
+  const handleSendMessage = (text) => {
+    const newMessage = {
+      text,
+      user: user?.email || "Anonymous",
+      timestamp: new Date().toISOString(),
+    };
+
+    dispatch(addMessage(newMessage));
+  };
+
+  return (
+    <div className="flex flex-col h-[80vh] rounded-lg shadow-md p-4">
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingSpinner size="lg" color="blue" />
+        </div>
+      ) : (
+        <div
+          ref={containerRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto mb-4 scroll-smooth"
+        >
+          {!messages.length ? (
+            <div className="text-center text-gray-500 mt-8">
+              No messages yet. Start a conversation!
+            </div>
+          ) : (
+            <>
+              <MessageGroupByDate messages={messages} />
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </div>
+      )}
+      <div className="flex-none">
+        <MessageInput onSend={handleSendMessage} />
+      </div>
+      {!isNearBottom && (
+        <ScrollToBottomButton onClick={() => handleScrollToBottom(true)} />
+      )}
+    </div>
+  );
+}
+
+function MessageGroupByDate({ messages }) {
+  const { preferences } = usePreferences();
+
   const handleGroupMessage = (messages) => {
     if (!preferences.messageGrouping) {
       return [{ date: "Messages", messages }];
@@ -104,51 +150,9 @@ function Chatbox() {
   const groupMessagesByDate = useCallback(handleGroupMessage, [
     preferences.messageGrouping,
   ]);
-
-  const handleSendMessage = (text) => {
-    const newMessage = {
-      text,
-      user: user?.email || "Anonymous",
-      timestamp: new Date().toISOString(),
-    };
-
-    dispatch(addMessage(newMessage));
-  };
-
-  return (
-    <div className="flex flex-col h-[80vh] rounded-lg shadow-md p-4">
-      {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <LoadingSpinner size="lg" color="blue" />
-        </div>
-      ) : (
-        <div
-          ref={containerRef}
-          onScroll={handleScroll}
-          className="flex-1 overflow-y-auto mb-4 scroll-smooth"
-        >
-          {messages.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
-              No messages yet. Start a conversation!
-            </div>
-          ) : (
-            <>
-              {groupMessagesByDate(messages).map(({ date, messages }) => (
-                <MessageGroup key={date} date={date} messages={messages} />
-              ))}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
-      )}
-      <div className="flex-none">
-        <MessageInput onSend={handleSendMessage} />
-      </div>
-      {!isNearBottom && (
-        <ScrollToBottomButton onClick={() => handleScrollToBottom(true)} />
-      )}
-    </div>
-  );
+  return groupMessagesByDate(messages).map(({ date, messages }) => (
+    <MessageGroup key={date} date={date} messages={messages} />
+  ));
 }
 
 export default Chatbox;

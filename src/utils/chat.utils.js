@@ -10,21 +10,15 @@ export const formatMessagePreview = (text) => {
 };
 
 export const formatText = (text) => {
-  // First apply manual formatting
-  const formattedText = text
-    // Code blocks
+  const formattedText = text // Code blocks
     .replace(
       /`([^`]+)`/g,
       '<code class="bg-gray-100 px-1 py-0.5 rounded font-mono text-sm">$1</code>'
-    )
-    // Bold
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    // Italic
-    .replace(/_([^_]+)_/g, "<em>$1</em>")
-    // Strikethrough
+    ) // Bold
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") // Italic
+    .replace(/_([^_]+)_/g, "<em>$1</em>") // Strikethrough
     .replace(/~~([^~]+)~~/g, "<del>$1</del>")
-    // Simple emoji replacement
-    .replace(/:smile:/g, "😊")
+    .replace(/:smile:/g, "😊") // Simple emoji replacement
     .replace(/:heart:/g, "❤️")
     .replace(/:thumbsup:/g, "👍");
 
